@@ -6,7 +6,6 @@ function confirmDialog(message) {
     }
     return new Promise((resolve) => {
         confirmVisible = true;
-        // Create the dialog box element
         let confirmDialog = document.createElement("div");
         confirmDialog.id = "confirmDialog";
         confirmDialog.innerHTML = "<style>" +
@@ -24,11 +23,9 @@ function confirmDialog(message) {
             "</div>";
         document.body.appendChild(confirmDialog);
 
-        // Get the yes and no buttons
         let confirmYes = document.getElementById("confirmYes");
         let confirmNo = document.getElementById("confirmNo");
 
-        // Add event listeners to the buttons
         confirmYes.addEventListener("click", function () {
             document.body.removeChild(confirmDialog);
             confirmVisible = false
@@ -41,7 +38,6 @@ function confirmDialog(message) {
             resolve(false);
         });
 
-        // Show the confirm dialog
         confirmDialog.style.display = "block";
 
         // Add CSS styles to the dialog box

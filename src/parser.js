@@ -1,85 +1,75 @@
 const encoder = new TextEncoder();
 
 class LinkedSet {
-    constructor() {
-        this.set = new Set();
-        this.array = [];
-    }
+  constructor() {
+    this.map = new Map();
+  }
 
-    add(value) {
-        if (!this.set.has(value)) {
-            this.set.add(value);
-            this.array.push(value);
-        }
+  add(value) {
+    if (!this.map.has(value)) {
+      this.map.set(value, this.map.size + 1);
     }
+  }
 
-    getPosition(value) {
-        return this.array.indexOf(value);
-    }
+  getPosition(value) {
+    return this.map.get(value);
+  }
 }
 
 function parseHtml(main) {
-    const main2 = main;
-    const chatHistory = [];
-    // console.log(main2)
-    let msgContainers = main2.querySelectorAll("div[role='row']");
+  const chatHistory = [];
+  const msgContainers = Array.from(
+    main.querySelectorAll("div[role='row']")
+  ).slice(-10);
 
-    const linkedSet = new LinkedSet();
-    msgContainers = Array.from(msgContainers).slice(-10);
-    msgContainers.forEach((el) => {
-        let messageStringCollector = '';
-        const elements = el.querySelectorAll('.copyable-text');
-        elements.forEach((el) => {
-            const messageLabel = el.getAttribute('data-pre-plain-text');
-            if (messageLabel !== null) { // get the prefix (person)
-                if (el.closest('.message-out') !== null) {
-                    messageStringCollector += "Me: ";
-                } else {
-                    // contactName should be obfuscated into a number, but repetitive utterances by the same user should carry the same label:
-                    let contactName = messageLabel.replace(/\[.*?\]\s*/, "").slice(0, -2)
-                    linkedSet.add(contactName)
-                    const contactNumber = linkedSet.getPosition(contactName) + 1
-                    // Using only the number turned out to be the only way to coerce GPT to no refer to these substitute label's It's a pity we cannot use the real names, but that would make it too privacy-sensitive, especially since you expose what other people said too.
-                    messageStringCollector += contactNumber + ": ";
-                }
-            } else { // get the message itself
-                const messageContent = getTextWithEmojis(el);
-                if (typeof messageContent !== "undefined") {
-                    messageStringCollector += messageContent;
-                }
-            }
-        })
-        if (messageStringCollector.length !== 0) {
-            chatHistory.push(messageStringCollector);
+  const linkedSet = new LinkedSet();
+  msgContainers.forEach((el) => {
+    let messageStringCollector = "";
+    const elements = el.querySelectorAll(".copyable-text"); 
+    elements.forEach((el) => {
+      const messageLabel = el.getAttribute("data-pre-plain-text");
+      if (messageLabel !== null) {
+        if (el.closest(".message-out") !== null) {
+          messageStringCollector += "Me: ";
+        } else {
+          let contactName = messageLabel.replace(/\[.*?\]\s*/, "").slice(0, -2);
+          linkedSet.add(contactName);
+          const contactNumber = linkedSet.getPosition(contactName);
+          messageStringCollector += contactNumber + ": ";
         }
+      } else {
+        const messageContent = getTextWithEmojis(el);
+        if (typeof messageContent !== "undefined") {
+          messageStringCollector += messageContent;
+        }
+      }
     });
-    // console.log('count', chatHistory.length)
-    // if last expression is mine
-    const lastExpression = chatHistory[chatHistory.length - 1];
-    let lastIsMine = false;
-    if (lastExpression.includes("Me:")) {
-        lastIsMine = true
+    if (messageStringCollector.length !== 0) {
+      chatHistory.push(messageStringCollector);
     }
-    const chatHistoryShortAsString = chatHistory.join('\n\n')
-    // console.log(chatHistoryShortAsString);
-    return {chatHistoryShort: chatHistoryShortAsString, lastIsMine: lastIsMine}
+  });
+
+  const lastExpression = chatHistory[chatHistory.length - 1] || "";
+  const lastIsMine = lastExpression.startsWith("Me:");
+
+  const chatHistoryShortAsString = chatHistory.join("\n\n");
+  return { chatHistoryShort: chatHistoryShortAsString, lastIsMine };
 }
 
 function getTextWithEmojis(element) {
-    let result = '';
-
-    for (const childNode of element.childNodes) {
-        if (childNode.nodeType === Node.TEXT_NODE) {
-            result += childNode.textContent;
-        } else if (childNode.nodeType === Node.ELEMENT_NODE) {
-            if (childNode.tagName === 'IMG' && childNode.hasAttribute('data-plain-text')) {
-                result += childNode.getAttribute('data-plain-text');
-            } else {
-                result += getTextWithEmojis(childNode);
-            }
-        }
-    }
-
-    return result;
+  return Array.from(element.childNodes)
+    .map((childNode) => {
+      if (childNode.nodeType === Node.TEXT_NODE) {
+        return childNode.textContent;
+      } else if (
+        childNode.nodeType === Node.ELEMENT_NODE &&
+        childNode.tagName === "IMG" &&
+        childNode.hasAttribute("data-plain-text")
+      ) {
+        return childNode.getAttribute("data-plain-text");
+      } else {
+        return getTextWithEmojis(childNode);
+      }
+    })
+    .join("");
 }
-

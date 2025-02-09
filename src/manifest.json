@@ -1,39 +1,28 @@
 {
   "manifest_version": 3,
-  "name": "ChatGPT answers for WhatsApp™ web",
-  "version": "0.0.5",
-  "description": "ChatGPT answer-suggestions for WhatsApp™ web",
+  "name": "WhatsApp suggestions",
+  "version": "1.0.0",
+  "author": "Harshit Goyal",
   "icons": {
-    "16": "icons/icon_16.png",
-    "32": "icons/icon_32.png",
-    "48": "icons/icon_48.png",
-    "128": "icons/icon_128.png"
+    "16": "icons/chat-16.png",
+    "32": "icons/chat-32.png",
+    "48": "icons/chat-48.png",
+    "128": "icons/chat-128.png"
   },
-  "host_permissions": [
-    "https://*.openai.com/"
-  ],
+  "description": "Generating response for WhatsApp using GPT",
   "background": {
     "service_worker": "background.js"
   },
+  "host_permissions": ["https://*.openai.com/"],
   "action": {
     "default_title": "GPT answers for WhatsApp™ web"
   },
-  "options_page": "options/options.html",
-  "permissions": [
-    "storage"
-  ],
   "content_scripts": [
     {
-      "matches": [
-        "https://web.whatsapp.com/*"
-      ],
+      "matches": ["https://web.whatsapp.com/*"],
       "run_at": "document_idle",
-      "js": [
-        "parser.js",
-        "uiStuff.js",
-        "confirmDialog.js",
-        "contentScript.js"
-      ]
+      "js": ["parser.js", "uiStuff.js", "confirmDialog.js", "contentScript.js"]
     }
-  ]
+  ],
+  "permissions": ["storage"]
 }

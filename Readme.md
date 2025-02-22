@@ -1,9 +1,8 @@
-# WhatsApp Suggestions by ChatGPT extension
+# ReplyXpert extension
 
-Welcome to the **WhatsApp Suggestions by ChatGPT extension** This extension is designed to make your WhatsApp Web experience more productive and efficient by providing you with AI-generated answer suggestions powered by OpenAI's ChatGPT.
+Welcome to the **ReplyXpert Extension** This extension is designed to make your WhatsApp Web experience more productive and efficient by providing you with AI-generated answer suggestions powered by OpenAI's ChatGPT.
 
 ## Features
-
 - AI-powered answer suggestions for your WhatsApp Web conversations
 - Customizable settings for answer generation
 - Quick and easy installation
